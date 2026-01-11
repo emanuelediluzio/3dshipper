@@ -25,8 +25,10 @@ def print_colored(text, color="cyan"):
 
 def get_venv_python():
     if platform.system() == "Windows":
-        return os.path.join(VENV_DIR, "Scripts", "python.exe")
-    return os.path.join(VENV_DIR, "bin", "python")
+        path = os.path.join(VENV_DIR, "Scripts", "python.exe")
+    else:
+        path = os.path.join(VENV_DIR, "bin", "python")
+    return os.path.abspath(path)
 
 def run_command(command, cwd=None, shell=True):
     try:
