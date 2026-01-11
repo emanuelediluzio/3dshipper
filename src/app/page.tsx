@@ -3,37 +3,27 @@
 import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { UploadSection } from "@/components/UploadSection"
-import { ProcessingView } from "@/components/ProcessingView"
-import { ModelViewer } from "@/components/ModelViewer"
+import { Github, CheckCircle, ArrowLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { RotateCw, Download, Github } from "lucide-react"
-
-type AppState = "upload" | "processing" | "result"
 
 export default function Home() {
-  const [step, setStep] = useState<AppState>("upload")
-  const [modelUrl, setModelUrl] = useState<string | null>(null)
+  const [isSubmitted, setIsSubmitted] = useState(false)
 
-  const handleFileSelect = async (file: File) => {
-    setStep("processing")
+  const handleApiSubmit = async (file: File, email: string) => {
+    // Here real implementation would be sending FormData to an API route
+    // const formData = new FormData()
+    // formData.append('image', file)
+    // formData.append('email', email)
+    // await fetch('/api/submit', { method: 'POST', body: formData })
 
-    // TODO: Implement actual API call here
-    // For now, simulate processing delay and return a dummy model
-    // Using a sample GLB from three.js repo or similar public source if possible, or just a placeholder
-    // I'll leave it as a mock timeout for now.
-
-    setTimeout(() => {
-      // Mock result
-      // Using a public model for demo purposes. 
-      // This is a placeholder. In real app, this comes from the backend.
-      setModelUrl("https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Duck/glTF-Binary/Duck.glb")
-      setStep("result")
-    }, 4000)
-  }
-
-  const handleReset = () => {
-    setStep("upload")
-    setModelUrl(null)
+    // Simulating network request
+    return new Promise<void>((resolve) => {
+      setTimeout(() => {
+        console.log("Submitting:", file.name, email)
+        setIsSubmitted(true)
+        resolve()
+      }, 1500)
+    })
   }
 
   return (
@@ -65,13 +55,13 @@ export default function Home() {
             Image to <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">3D Model</span>
           </h1>
           <p className="text-muted-foreground max-w-lg mx-auto text-lg">
-            Turn any 2D image into a high-quality 3D asset using pure AI magic.
+            Richiedi la generazione del tuo modello 3D AI.
           </p>
         </div>
 
         <div className="w-full max-w-2xl">
           <AnimatePresence mode="wait">
-            {step === "upload" && (
+            {!isSubmitted ? (
               <motion.div
                 key="upload"
                 initial={{ opacity: 0, y: 20 }}
@@ -79,42 +69,31 @@ export default function Home() {
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.4 }}
               >
-                <UploadSection onFileSelect={handleFileSelect} />
+                <UploadSection onApiSubmit={handleApiSubmit} />
               </motion.div>
-            )}
-
-            {step === "processing" && (
+            ) : (
               <motion.div
-                key="processing"
+                key="success"
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 1.05 }}
-                transition={{ duration: 0.4 }}
+                className="bg-card border border-muted-foreground/25 rounded-xl p-12 text-center"
               >
-                <ProcessingView />
-              </motion.div>
-            )}
-
-            {step === "result" && modelUrl && (
-              <motion.div
-                key="result"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-                className="space-y-6"
-              >
-                <ModelViewer modelUrl={modelUrl} />
-
-                <div className="flex gap-4 justify-center">
-                  <Button onClick={handleReset} variant="outline" className="gap-2">
-                    <RotateCw className="h-4 w-4" />
-                    Generate Another
-                  </Button>
-                  <Button className="gap-2" onClick={() => window.open(modelUrl, '_blank')}>
-                    <Download className="h-4 w-4" />
-                    Download GLB
-                  </Button>
+                <div className="flex justify-center mb-6">
+                  <div className="h-20 w-20 bg-green-500/10 text-green-500 rounded-full flex items-center justify-center">
+                    <CheckCircle className="h-10 w-10" />
+                  </div>
                 </div>
+                <h2 className="text-2xl font-bold mb-4">Richiesta Inviata!</h2>
+                <p className="text-muted-foreground mb-8 max-w-md mx-auto">
+                  Abbiamo ricevuto la tua immagine. Entro 24 ore riceverai un'email con l'anteprima video del tuo modello 3D e le opzioni per la stampa.
+                </p>
+                <Button
+                  variant="outline"
+                  onClick={() => setIsSubmitted(false)}
+                  className="gap-2"
+                >
+                  <ArrowLeft className="h-4 w-4" /> Invia un'altra richiesta
+                </Button>
               </motion.div>
             )}
           </AnimatePresence>

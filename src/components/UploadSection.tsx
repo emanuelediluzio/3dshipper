@@ -8,12 +8,14 @@ import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
 interface UploadSectionProps {
-    onFileSelect: (file: File) => void
+    onApiSubmit: (file: File, email: string) => void
 }
 
-export function UploadSection({ onFileSelect }: UploadSectionProps) {
+export function UploadSection({ onApiSubmit }: UploadSectionProps) {
     const [preview, setPreview] = useState<string | null>(null)
     const [file, setFile] = useState<File | null>(null)
+    const [email, setEmail] = useState("")
+    const [isSubmitting, setIsSubmitting] = useState(false)
 
     const onDrop = useCallback((acceptedFiles: File[]) => {
         const selectedFile = acceptedFiles[0]
@@ -36,26 +38,30 @@ export function UploadSection({ onFileSelect }: UploadSectionProps) {
         e.stopPropagation()
         setFile(null)
         setPreview(null)
+        setEmail("")
     }
 
-    const handleContinue = (e: React.MouseEvent) => {
+    const handleSubmit = async (e: React.MouseEvent) => {
         e.stopPropagation()
-        if (file) {
-            onFileSelect(file)
+        if (file && email) {
+            setIsSubmitting(true)
+            await onApiSubmit(file, email)
+            setIsSubmitting(false)
         }
     }
 
     return (
         <div className="w-full max-w-xl mx-auto">
             <div
-                {...getRootProps()}
+                {...(!preview ? getRootProps() : {})}
                 className={cn(
-                    "relative group cursor-pointer rounded-xl border border-dashed border-muted-foreground/25 bg-muted/50 transition-all hover:bg-muted/80 hover:border-muted-foreground/50",
+                    "relative group rounded-xl border border-dashed border-muted-foreground/25 bg-muted/50 transition-all",
+                    !preview && "cursor-pointer hover:bg-muted/80 hover:border-muted-foreground/50",
                     isDragActive && "border-primary/50 bg-primary/5",
-                    preview ? "h-[450px]" : "h-[300px]"
+                    preview ? "h-auto border-transparent bg-transparent" : "h-[300px]"
                 )}
             >
-                <input {...getInputProps()} />
+                {!preview && <input {...getInputProps()} />}
 
                 <AnimatePresence mode="wait">
                     {!preview ? (
@@ -83,40 +89,69 @@ export function UploadSection({ onFileSelect }: UploadSectionProps) {
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
-                            className="absolute inset-0 flex flex-col items-center justify-center bg-black/50 backdrop-blur-sm rounded-xl"
+                            className="w-full"
                         >
-                            {/* Background Blur Image */}
-                            <div
-                                className="absolute inset-0 bg-cover bg-center opacity-50 blur-xl rounded-xl"
-                                style={{ backgroundImage: `url(${preview})` }}
-                            />
-
-                            {/* Main Preview Image */}
-                            <div className="relative z-10 flex flex-col items-center gap-6 p-4">
-                                {/* eslint-disable-next-line @next/next/no-img-element */}
-                                <img
-                                    src={preview}
-                                    alt="Preview"
-                                    className="max-h-[280px] w-auto rounded-lg shadow-2xl ring-1 ring-white/10"
-                                />
-
-                                <div className="absolute top-2 right-2 flex gap-2">
+                            <div className="rounded-xl border border-muted-foreground/25 bg-card overflow-hidden shadow-2xl">
+                                <div className="relative h-[250px] w-full bg-black/50">
+                                    <div
+                                        className="absolute inset-0 bg-cover bg-center opacity-50 blur-xl"
+                                        style={{ backgroundImage: `url(${preview})` }}
+                                    />
+                                    <img
+                                        src={preview}
+                                        alt="Preview"
+                                        className="relative z-10 h-full w-auto mx-auto object-contain p-4"
+                                    />
                                     <Button
                                         size="icon"
                                         variant="secondary"
-                                        className="h-8 w-8 rounded-full bg-black/50 backdrop-blur hover:bg-black/70 text-white border-white/10"
+                                        className="absolute top-2 right-2 h-8 w-8 rounded-full bg-black/50 backdrop-blur hover:bg-black/70 text-white border-white/10 z-20"
                                         onClick={clearSelection}
                                     >
                                         <X className="h-4 w-4" />
                                     </Button>
                                 </div>
 
-                                <Button
-                                    onClick={handleContinue}
-                                    className="gap-2 rounded-full px-8 shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 ring-2 ring-primary/20"
-                                >
-                                    Generate 3D Model <ArrowRight className="h-4 w-4" />
-                                </Button>
+                                <div className="p-6 space-y-6">
+                                    <div className="space-y-2">
+                                        <label htmlFor="email" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                                            La tua Email
+                                        </label>
+                                        <input
+                                            type="email"
+                                            id="email"
+                                            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                            placeholder="nome@esempio.com"
+                                            value={email}
+                                            onChange={(e) => setEmail(e.target.value)}
+                                        />
+                                        <p className="text-xs text-muted-foreground">
+                                            Riceverai il risultato qui.
+                                        </p>
+                                    </div>
+
+                                    <div className="bg-muted/50 p-4 rounded-lg text-sm space-y-2 text-muted-foreground">
+                                        <p>
+                                            <span className="font-semibold text-foreground">Cosa succede ora?</span>
+                                        </p>
+                                        <ul className="list-disc list-inside space-y-1">
+                                            <li>Entro 1 giorno lavorativo riceverai un video del modello 3D.</li>
+                                            <li>Potrai scegliere se acquistare solo il file digitale o la stampa 3D spedita a casa.</li>
+                                        </ul>
+                                    </div>
+
+                                    <Button
+                                        onClick={handleSubmit}
+                                        disabled={!email || isSubmitting}
+                                        className="w-full gap-2 text-lg py-6"
+                                    >
+                                        {isSubmitting ? (
+                                            <>Invio in corso...</>
+                                        ) : (
+                                            <>Invia Richiesta <ArrowRight className="h-5 w-5" /></>
+                                        )}
+                                    </Button>
+                                </div>
                             </div>
                         </motion.div>
                     )}
