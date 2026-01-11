@@ -10,20 +10,25 @@ export default function Home() {
   const [isSubmitted, setIsSubmitted] = useState(false)
 
   const handleApiSubmit = async (file: File, email: string) => {
-    // Here real implementation would be sending FormData to an API route
-    // const formData = new FormData()
-    // formData.append('image', file)
-    // formData.append('email', email)
-    // await fetch('/api/submit', { method: 'POST', body: formData })
+    const formData = new FormData()
+    formData.append('image', file)
+    formData.append('email', email)
 
-    // Simulating network request
-    return new Promise<void>((resolve) => {
-      setTimeout(() => {
-        console.log("Submitting:", file.name, email)
-        setIsSubmitted(true)
-        resolve()
-      }, 1500)
-    })
+    try {
+      const response = await fetch('/api/submit', {
+        method: 'POST',
+        body: formData
+      })
+
+      if (!response.ok) {
+        console.error("Submission failed")
+        // In a real app we'd show a toast error here
+      }
+
+      setIsSubmitted(true)
+    } catch (e) {
+      console.error("Network error", e)
+    }
   }
 
   return (
