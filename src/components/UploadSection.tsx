@@ -50,9 +50,9 @@ export function UploadSection({ onFileSelect }: UploadSectionProps) {
             <div
                 {...getRootProps()}
                 className={cn(
-                    "relative group cursor-pointer overflow-hidden rounded-xl border border-dashed border-muted-foreground/25 bg-muted/50 transition-all hover:bg-muted/80 hover:border-muted-foreground/50",
+                    "relative group cursor-pointer rounded-xl border border-dashed border-muted-foreground/25 bg-muted/50 transition-all hover:bg-muted/80 hover:border-muted-foreground/50",
                     isDragActive && "border-primary/50 bg-primary/5",
-                    preview ? "h-[400px]" : "h-[300px]"
+                    preview ? "h-[450px]" : "h-[300px]"
                 )}
             >
                 <input {...getInputProps()} />
@@ -83,24 +83,24 @@ export function UploadSection({ onFileSelect }: UploadSectionProps) {
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
-                            className="absolute inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+                            className="absolute inset-0 flex flex-col items-center justify-center bg-black/50 backdrop-blur-sm rounded-xl"
                         >
                             {/* Background Blur Image */}
                             <div
-                                className="absolute inset-0 bg-cover bg-center opacity-50 blur-xl"
+                                className="absolute inset-0 bg-cover bg-center opacity-50 blur-xl rounded-xl"
                                 style={{ backgroundImage: `url(${preview})` }}
                             />
 
                             {/* Main Preview Image */}
-                            <div className="relative z-10 p-4">
+                            <div className="relative z-10 flex flex-col items-center gap-6 p-4">
                                 {/* eslint-disable-next-line @next/next/no-img-element */}
                                 <img
                                     src={preview}
                                     alt="Preview"
-                                    className="max-h-[300px] w-auto rounded-lg shadow-2xl ring-1 ring-white/10"
+                                    className="max-h-[280px] w-auto rounded-lg shadow-2xl ring-1 ring-white/10"
                                 />
 
-                                <div className="absolute top-6 right-6 flex gap-2">
+                                <div className="absolute top-2 right-2 flex gap-2">
                                     <Button
                                         size="icon"
                                         variant="secondary"
@@ -111,14 +111,12 @@ export function UploadSection({ onFileSelect }: UploadSectionProps) {
                                     </Button>
                                 </div>
 
-                                <div className="absolute -bottom-16 left-1/2 -translate-x-1/2 w-full flex justify-center">
-                                    <Button
-                                        onClick={handleContinue}
-                                        className="gap-2 rounded-full px-8 shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 ring-2 ring-primary/20"
-                                    >
-                                        Generate 3D Model <ArrowRight className="h-4 w-4" />
-                                    </Button>
-                                </div>
+                                <Button
+                                    onClick={handleContinue}
+                                    className="gap-2 rounded-full px-8 shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 ring-2 ring-primary/20"
+                                >
+                                    Generate 3D Model <ArrowRight className="h-4 w-4" />
+                                </Button>
                             </div>
                         </motion.div>
                     )}
