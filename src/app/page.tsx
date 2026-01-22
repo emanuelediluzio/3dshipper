@@ -29,7 +29,7 @@ export default function Home() {
       }
 
       setIsSubmitted(true)
-    } catch (e) {
+    } catch {
       setError('Network error. Please check your connection and try again.')
     }
   }
@@ -102,14 +102,14 @@ export default function Home() {
                 </div>
                 <h2 className="text-2xl font-bold mb-4">Richiesta Inviata!</h2>
                 <p className="text-muted-foreground mb-8 max-w-md mx-auto">
-                  Abbiamo ricevuto la tua immagine. Entro 24 ore riceverai un'email con l'anteprima video del tuo modello 3D e le opzioni per la stampa.
+                  Abbiamo ricevuto la tua immagine. Entro 24 ore riceverai un&apos;email con l&apos;anteprima video del tuo modello 3D e le opzioni per la stampa.
                 </p>
                 <Button
                   variant="outline"
                   onClick={() => setIsSubmitted(false)}
                   className="gap-2"
                 >
-                  <ArrowLeft className="h-4 w-4" /> Invia un'altra richiesta
+                  <ArrowLeft className="h-4 w-4" /> Invia un&apos;altra richiesta
                 </Button>
               </motion.div>
             )}

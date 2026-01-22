@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react"
 import { useDropzone } from "react-dropzone"
 import { motion, AnimatePresence } from "framer-motion"
-import { Upload, X, FileImage, ArrowRight } from "lucide-react"
+import { Upload, X, ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
