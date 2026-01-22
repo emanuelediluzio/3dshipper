@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 
 export default function Home() {
   const [isSubmitted, setIsSubmitted] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const handleApiSubmit = async (file: File, email: string) => {
     const formData = new FormData()
@@ -15,19 +16,21 @@ export default function Home() {
     formData.append('email', email)
 
     try {
+      setError(null)
       const response = await fetch('/api/submit', {
         method: 'POST',
         body: formData
       })
 
       if (!response.ok) {
-        console.error("Submission failed")
-        // In a real app we'd show a toast error here
+        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }))
+        setError(errorData.error || 'Submission failed. Please try again.')
+        return
       }
 
       setIsSubmitted(true)
-    } catch (e) {
-      console.error("Network error", e)
+    } catch {
+      setError('Network error. Please check your connection and try again.')
     }
   }
 
@@ -46,7 +49,7 @@ export default function Home() {
           Hunyuan3D
         </div>
         <div className="flex gap-4">
-          <a href="https://github.com/Tencent-Hunyuan/Hunyuan3D-Part" target="_blank" rel="noreferrer" className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
+          <a href="https://github.com/Tencent-Hunyuan/Hunyuan3D-Part" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
             <Github className="h-4 w-4" />
             <span className="hidden sm:inline">GitHub</span>
           </a>
@@ -65,6 +68,15 @@ export default function Home() {
         </div>
 
         <div className="w-full max-w-2xl">
+          {error && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-4 p-4 bg-red-500/10 border border-red-500/50 rounded-lg text-red-500 text-sm"
+            >
+              <strong>Error:</strong> {error}
+            </motion.div>
+          )}
           <AnimatePresence mode="wait">
             {!isSubmitted ? (
               <motion.div
@@ -90,14 +102,14 @@ export default function Home() {
                 </div>
                 <h2 className="text-2xl font-bold mb-4">Richiesta Inviata!</h2>
                 <p className="text-muted-foreground mb-8 max-w-md mx-auto">
-                  Abbiamo ricevuto la tua immagine. Entro 24 ore riceverai un'email con l'anteprima video del tuo modello 3D e le opzioni per la stampa.
+                  Abbiamo ricevuto la tua immagine. Entro 24 ore riceverai un&apos;email con l&apos;anteprima video del tuo modello 3D e le opzioni per la stampa.
                 </p>
                 <Button
                   variant="outline"
                   onClick={() => setIsSubmitted(false)}
                   className="gap-2"
                 >
-                  <ArrowLeft className="h-4 w-4" /> Invia un'altra richiesta
+                  <ArrowLeft className="h-4 w-4" /> Invia un&apos;altra richiesta
                 </Button>
               </motion.div>
             )}

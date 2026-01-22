@@ -1,9 +1,9 @@
 "use client"
 
-import { useCallback, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { useDropzone } from "react-dropzone"
 import { motion, AnimatePresence } from "framer-motion"
-import { Upload, X, FileImage, ArrowRight } from "lucide-react"
+import { Upload, X, ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
@@ -26,6 +26,15 @@ export function UploadSection({ onApiSubmit }: UploadSectionProps) {
         }
     }, [])
 
+    // Cleanup object URL on unmount or when preview changes
+    useEffect(() => {
+        return () => {
+            if (preview) {
+                URL.revokeObjectURL(preview)
+            }
+        }
+    }, [preview])
+
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
         onDrop,
         accept: {
@@ -36,6 +45,9 @@ export function UploadSection({ onApiSubmit }: UploadSectionProps) {
 
     const clearSelection = (e: React.MouseEvent) => {
         e.stopPropagation()
+        if (preview) {
+            URL.revokeObjectURL(preview)
+        }
         setFile(null)
         setPreview(null)
         setEmail("")
